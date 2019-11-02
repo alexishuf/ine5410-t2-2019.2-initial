@@ -1,0 +1,8 @@
+*.iml
+.eclipse
+.project
+.idea
+target
+*~
+*.swp
+dependency-reduced-pom.xml
