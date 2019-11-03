@@ -10,8 +10,10 @@ import static java.lang.Math.*;
 
 public class InternManager {
     private Semaphore idleInterns;
+    private final int hiredInterns;
 
     public InternManager(int interns) {
+        this.hiredInterns = interns;
         this.idleInterns = new Semaphore(interns);
     }
 
@@ -25,5 +27,9 @@ public class InternManager {
         } finally {
             idleInterns.release();
         }
+    }
+
+    public int getHiredInterns() {
+        return hiredInterns;
     }
 }
