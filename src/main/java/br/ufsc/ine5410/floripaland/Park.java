@@ -10,7 +10,7 @@ public class Park implements AutoCloseable {
     }
 
     public Attraction create(@Nonnull Attraction.Type type, @Nonnull Point position,
-                             int minGroupSize,
+                             int groupSize,
                              int groupsCapacity, @Nonnull AttractionVisitor visit) {
         throw new UnsupportedOperationException("Me implemente!");
     }

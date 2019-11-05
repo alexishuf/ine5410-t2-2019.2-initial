@@ -4,6 +4,7 @@ import br.ufsc.ine5410.floripaland.mocks.MockPerson;
 import br.ufsc.ine5410.floripaland.mocks.TimedVisitor;
 import br.ufsc.ine5410.floripaland.movement.InternManager;
 import br.ufsc.ine5410.floripaland.movement.Point;
+import br.ufsc.ine5410.floripaland.safety.SafetyItem;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -35,7 +36,8 @@ public class Main {
             while (true) {
                 int idx = (int) Math.floor(Math.random() * attractions.size());
                 Attraction a = attractions.get(idx);
-                MockPerson person = new MockPerson(Math.random() > 0.8);
+                boolean premium = Math.random() > 0.8;
+                MockPerson person = new MockPerson(premium);
                 boolean ok = a.enter(person);
                 System.out.printf("%s %s %s@%s\n", person, ok ? "entered" : "gave up",
                         a.getType(), a.getPosition());
@@ -84,6 +86,12 @@ public class Main {
         attractions.add(park.create(HIKING, point, 4, 5, v900));
 
         for (Attraction a : attractions) {
+            List<SafetyItem> items = new ArrayList<>();
+            for (int i = 0; i < 4; i++) {
+                items.add(new SafetyItem(SafetyItem.Type.HELMET));
+                items.add(new SafetyItem(SafetyItem.Type.LIFE_JACKET));
+            }
+            a.deliver(items);
             a.openAttraction();
         }
     }
