@@ -56,7 +56,7 @@ public class TimedVisitor implements AttractionVisitor {
         Stopwatch sw = Stopwatch.createStarted();
         int observed = visiting.incrementAndGet();
         for (int current = maxVisiting.get(); observed > current; current = maxVisiting.get()) {
-            if (maxVisiting.compareAndExchange(current, observed) == current)
+            if (maxVisiting.compareAndSet(current, observed))
                 break;
         }
         int duration = minTime + (int) Math.round(Math.random() * (maxTime - minTime));
