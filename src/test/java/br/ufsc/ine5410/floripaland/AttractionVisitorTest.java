@@ -27,4 +27,26 @@ public class AttractionVisitorTest extends AttractionTestBase {
         assertTrue(person.waitForExitAttraction(400));
         assertEquals(0, person.getExitQueueCalls());
     }
+
+    @Test
+    public void testCloseWithVisitors() throws InterruptedException {
+        attraction = build().withTime(400).getOpen(FERRIS_WHEEL);
+        MockPerson person = new MockPerson(false);
+        attraction.enter(person);
+        assertTrue(person.waitForEnterAttraction(100));
+
+        Thread thread = new Thread(() -> {
+            try {
+                attraction.closeAttraction();
+            } catch (InterruptedException ignored) {
+            }
+        });
+        thread.start();
+
+        assertTrue(person.waitForExitAttraction(400+100));
+        thread.join();
+        assertEquals(0, person.getExitQueueCalls());
+
+        assertFalse(attraction.enter(new MockPerson(true)));
+    }
 }

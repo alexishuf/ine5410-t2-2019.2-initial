@@ -4,7 +4,11 @@ import br.ufsc.ine5410.floripaland.mocks.MockPerson;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static br.ufsc.ine5410.floripaland.Attraction.Type.FERRIS_WHEEL;
 import static org.junit.Assert.*;
@@ -103,5 +107,27 @@ public class AttractionQueueingTest extends AttractionTestBase {
     @Test(timeout = 2000*2*10)
     public void testStressPairsNoSafetyItems() {
         stressTest(build(), 2);
+    }
+
+    @Test(timeout = 1000*10)
+    public void testConcurrentlyEnter() throws InterruptedException {
+        attraction = build().withTime(1).withGroupSize(2).getOpen(FERRIS_WHEEL);
+        List<MockPerson> list = new ArrayList<>(6000);
+        ExecutorService exec = Executors.newCachedThreadPool();
+        try {
+            for (int i = 0; i < 6000; i++) {
+                MockPerson person = new MockPerson(i % 5 == 0);
+                list.add(person);
+                exec.submit(() -> attraction.enter(person));
+            }
+        } finally {
+            exec.shutdown();
+            exec.awaitTermination(500, TimeUnit.MILLISECONDS);
+        }
+        for (MockPerson person : list)
+            person.waitForExitAttraction(Integer.MAX_VALUE);
+        assertEquals(0, list.stream().filter(p -> p.getEnterCalls() != 1).count());
+        assertEquals(0, list.stream().filter(p -> p.getExitCalls() != 1).count());
+        assertEquals(0, list.stream().filter(p -> p.getExitQueueCalls() > 0).count());
     }
 }
